@@ -1,0 +1,13 @@
+{
+  "name": "api-node-server",
+  "version": "1.0.0",
+  "description": "The middleware server for making requests.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "Filipp Zhuravlev <shiningfinger@list.ru>",
+  "license": "ISC"
+}
