@@ -5,96 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>The middleware server</title>
-
-  <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: inherit;
-    }
-
-    * + * {
-      margin-top: 1.5em;
-      margin-bottom: 1.5em;
-    }
-
-    html {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-    }
-
-    body {
-      display: grid;
-      margin: 0;
-      grid-template-areas:
-        "h h h h"
-        "m m m m"
-        "m m m m"
-        "f f f f"; 
-      font-size: calc(1vw + .5em);
-      line-height: 1.5;
-      font-family: Verdana, Geneva, Tahoma, sans-serif;
-      background-color: #f7f7f7;
-      color: #333;
-    }
-
-    header, footer {
-      background-color: #f1f1f1;
-      margin: 0;
-      padding: 1.5em 0;
-    }
-    header {
-      grid-area: h;
-    }
-
-    footer {
-      grid-area: f;
-    }
-
-    main {
-      grid-area: m;
-      margin: 0;
-    }
-
-    main > .container {
-      background-color: #fff;
-      height: 100%;
-      padding-top: 1.5em;
-      padding-bottom: 1.5em;;
-    }
-
-    .container {
-      max-width: 1024px;
-      margin-left: auto;
-      margin-right: auto;
-      padding-left: .75em;
-      padding-right: .75em; 
-    }
-
-  </style>
+  <link rel="stylesheet" href="static/index.css" />
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>The page without normilized styles</h1>
+      <h1>Server with requests</h1>
     </div>
   </header>
 
   <main>
     <div class="container">
-      <h1>I enjoy to do it</h1>
+      <h1>Check requests with different codes</h1>
   
       <p>It's possible, i'll inject requests' information inside this block.</p>
+
+      <ul>
+        <li><button id="code302" type="button">Get 302 code!</button>
+        </li>
+
+        <li><button id="code401" type="button">Get 401 code!</button></li>
+      </ul>
+
+      <section>
+        <h2>Request results</h2>
+
+        <button id="clearListButton">Clear requests list</button>
+
+        <ul id="resultsList"></ul>
+      </section>
+
+      <p>
+        Go to <a href="/redirect/tele2">Tele2</a> site
+      </p>
     </div>
   </main>
 
   <footer>
     <div class="container">
-      <p>Created by <a href="https://shining-present.ru">Filipp Zhuravlev</a> with love and without styles</p>
+      <p>Created by <a target="_blank" href="https://shining-present.ru">Filipp Zhuravlev</a> with love</p>
     </div>
   </footer>
+
+  <script defer src="axios/dist/axios.min.js"></script>
+  <script defer src="static/index.js"></script>
 </body>
 </html>

@@ -1,0 +1,110 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+* + * {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  display: grid;
+  margin: 0;
+  grid-template-areas:
+    "h h h h"
+    "m m m m"
+    "m m m m"
+    "f f f f"; 
+  font-size: calc(1vw + .5em);
+  line-height: 1.5;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+}
+
+header, footer {
+  background-color: #f1f1f1;
+  margin: 0;
+  padding: 1.5em 0;
+}
+
+header {
+  grid-area: h;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-left: -5px;
+}
+
+footer {
+  grid-area: f;
+}
+
+main {
+  grid-area: m;
+  margin: 0;
+}
+
+main > .container {
+  background-color: #fff;
+  height: 100%;
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;;
+}
+
+.container {
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25em;
+  padding-right: 1.25em; 
+}
+
+button {
+  border: 2px solid #333;
+  background-color: #fdd990;
+  padding: .35em .75em .45em;
+  vertical-align: middle;
+  transition-duration: 250ms;
+  font-size: 21px;
+}
+
+button:hover, button:focus {
+  transform: scale(1.03);
+  box-shadow: 2px 0 15px rgba(0,0,0,.2);
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  display: inline-block;
+}
+
+pre {
+  background-color: #333;
+  padding: 1rem 1rem 1.25rem 1.25rem;
+  font-size: 14px;
+  color: #f7f7f7;
+  border-radius: 4px;
+
+}
+
+pre * {
+  font-size: 14px;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
