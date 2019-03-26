@@ -17,7 +17,7 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use(requests)
+app.use('/api', requests)
 app.use(codeStatuses)
 
 app.use('/', (req, res) => {
