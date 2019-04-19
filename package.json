@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "image": "docker image build -t request-server-image .",
+    "container": "docker container run -d --name request-server -p 4080:4080 request-server-image"
   },
   "keywords": [],
   "author": "Filipp Zhuravlev <shiningfinger@list.ru>",
