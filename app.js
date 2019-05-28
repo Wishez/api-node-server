@@ -20,9 +20,14 @@ app.use(bodyParser.json())
 app.use('/api', requests)
 app.use(codeStatuses)
 
-app.use('/', (req, res) => {
+app.get('/test', (req, res) => {
+  res.sendFile(_.resolvePath('static/templates/test/index.html'))
+})
+
+app.get('/', (req, res) => {
   res.sendFile(_.resolvePath('static/index.html'))
 })
+
 
 const PORT = 4080
 app.listen(PORT, () => {

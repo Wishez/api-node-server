@@ -13,6 +13,13 @@ html {
   box-sizing: border-box;
 }
 
+iframe {
+  margin: 1em;
+  min-height: 500px;
+  width: 100%;
+  border: 4px solid #333;
+}
+
 html, body {
   height: 100%;
 }

@@ -1,6 +1,9 @@
 
 let responseOrder = 1
 window.addEventListener('load', () => {
+  console.log('load')
+  const { pathname, search, hash } = window.location
+  window.postMessage(`${pathname}${search}${hash}`, '*')
   const $resultsList = $('#resultsList')
 
   onButtonClickDoGetRequest({
