@@ -7,6 +7,7 @@ const _ = require('./helpers')
 
 const requests = require('./routes/requests')
 const codeStatuses = require('./routes/code-statuses')
+const rokfellerAdminRequests = require('./routes/rokfeller-admin.api')
 
 const app = express()
 const staticPath = '/static'
@@ -14,11 +15,13 @@ app.use(staticPath, express.static(_.resolvePath('static')))
 app.use(express.static(_.resolvePath('node_modules')))
 app.use(morgan('dev'))
 app.use(cors())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 app.use('/api', requests)
 app.use(codeStatuses)
+
+app.use('/api/lots', rokfellerAdminRequests)
 
 app.get('/test', (req, res) => {
   res.sendFile(_.resolvePath('static/templates/test/index.html'))
