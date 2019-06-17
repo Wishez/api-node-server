@@ -85,7 +85,6 @@ router.put('/bought', (req, res) => {
 })
 
 router.post('/created', (req, res) => {
-  console.log(typeof req.body)
   const { trafficType, number } = req.body.operatorLotParams
   Array(number).fill(0).forEach(() => {
     lastId++

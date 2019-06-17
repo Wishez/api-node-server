@@ -1,10 +1,10 @@
 const router = require('express').Router()
 
-router.use('/check-user-agent-header', (req, res) => {
+router.get('/check-user-agent-header', (req, res) => {
   res.send(`При запросе установил заголовок User-Agent: 'web'.<br/>Извлёк на сервере заголовок User-Agent: ${req.get('User-Agent')}`)
 })
 
-router.use('/contract/numbers', (req, res) => {
+router.get('/contract/numbers', (req, res) => {
   res.json({
     meta: {
       status: 'OK',
