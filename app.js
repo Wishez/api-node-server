@@ -5,9 +5,6 @@ const morgan = require('morgan')
 
 const _ = require('./helpers')
 
-const requests = require('./routes/requests')
-const codeStatuses = require('./routes/code-statuses')
-const rokfellerAdminRequests = require('./routes/rokfeller-admin.api')
 
 const app = express()
 const staticPath = '/static'
@@ -18,6 +15,12 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
+const requests = require('./routes/requests')
+const codeStatuses = require('./routes/code-statuses')
+const rokfellerAdminRequests = require('./routes/rokfeller-admin.api')
+const tele2Pages = require('./routes/tele2-pages')
+
+app.use('/', tele2Pages)
 app.use('/api', requests)
 app.use(codeStatuses)
 
