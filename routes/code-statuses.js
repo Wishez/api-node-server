@@ -1,10 +1,31 @@
 
 const router = require('express').Router()
 
+const getResponse = ({
+  data,
+  status = 'OK',
+  message = null,
+}) => ({
+  meta: {
+    status,
+    message,
+  },
+  data,
+})
+
 router.get('/api/302', (req, res) => {
   console.log(req.url)
   res.set('Location', '/success')
   res.status(302).send('Go to success')
+})
+
+
+router.get('/api/503', (req, res) => {
+  res.status(503).json(getResponse({ status: 'ERROR' }))
+})
+
+router.get('/api/400', (req, res) => {
+  res.status(400).json(getResponse({ status: 'ERROR' }))
 })
 
 router.get('/api/401', (req, res) => {

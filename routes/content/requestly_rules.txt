@@ -1,0 +1,191 @@
+[
+  {
+    "creationDate": 1560255277328,
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_1560255277328",
+    "name": "Lots Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://localhost:4080/api/lots/",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "/site"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/created",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/created"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/statistics",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/statistics"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/bought",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/bought"
+        }
+      }
+    ],
+    "ruleType": "Redirect",
+    "status": "Inactive",
+    "isSample": false
+  },
+  {
+    "creationDate": 1560169516949,
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_1560169516949",
+    "name": "Lots Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://localhost:4080/api/lots/",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "siteMsk/lots"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/created",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/created"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/statistics",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "exchange/statistics"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/bought",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/bought"
+        }
+      }
+    ],
+    "ruleType": "Redirect",
+    "status": "Inactive",
+    "isSample": false
+  },
+  {
+    "creationDate": 1559835897936,
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_1559835897936",
+    "name": "Lots",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://localhost:4080/api/lots/",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "siteMsk/lots"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/created",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/created"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/statistics",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/statistics"
+        }
+      },
+      {
+        "destination": "http://localhost:4080/api/lots/bought",
+        "source": {
+          "filters": {},
+          "key": "Url",
+          "operator": "Contains",
+          "value": "lots/bought"
+        }
+      }
+    ],
+    "ruleType": "Redirect",
+    "status": "Inactive",
+    "isSample": false
+  },
+  {
+    "creationDate": 1555655855700,
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_1555655855700",
+    "name": "Esia indentifystatus",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "https://localhost:4080/indentifystatus",
+        "source": {
+          "key": "Url",
+          "operator": "Matches",
+          "value": "/\\/api\\/subscrbers\\/(\\w+)\\/indentifystatus$/"
+        }
+      }
+    ],
+    "ruleType": "Redirect",
+    "status": "Inactive",
+    "isSample": false
+  },
+  {
+    "creationDate": 1555593159336,
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_1555593159336",
+    "name": "Tele2 contract numbers request",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://localhost:4080/api/contract/numbers",
+        "source": {
+          "key": "path",
+          "operator": "Contains",
+          "value": "/contract/numbers"
+        }
+      }
+    ],
+    "ruleType": "Redirect",
+    "status": "Active",
+    "isSample": false
+  }
+]

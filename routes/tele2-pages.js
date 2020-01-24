@@ -14,7 +14,18 @@ const ContentNames = {
   HELP: 'help',
   HOME: 'home',
   ONLINE: 'my-online_new',
+  TIZER: 'tizer',
+  JOURNAL: 'journal',
+  ROAMING: 'roaming',
+  BANNER: 'banner'
 }
+
+
+router.get('/esia/redirect', (req, res) => {
+  res.status(302)
+  res.set('Location', 'https:/msk.uat-02.corp.tele2.ru/redirect-processing?resource-type=esia&code=1234')
+  res.end()
+})
 
 const contents = Object.values(ContentNames)
   .reduce((result, key) => ({
@@ -63,6 +74,63 @@ router.get('/search', (req, res) => {
 
 router.get('/tariff/online', (req, res) => {
   if (req.query.format === 'json') res.json(contents[ContentNames.ONLINE])
+})
+
+router.get('/tizer', (req, res) => {
+  if (req.query.format === 'json') res.json(contents[ContentNames.TIZER])
+})
+
+router.get('/mobile/roaming', (req, res) => {
+  if (req.query.format === 'json') res.json(contents[ContentNames.TIZER])
+})
+
+router.get('/journal', (req, res) => {
+  if (req.query.format === 'json') res.json(contents[ContentNames.JOURNAL])
+})
+
+router.get('/roaming', (req, res) => {
+  if (req.query.format === 'json') res.json(contents[ContentNames.ROAMING])
+})
+
+router.get('/banner|/lk', (req, res) => {
+  if (req.query.format === 'json') res.json(contents[ContentNames.BANNER])
+})
+
+router.get('/check', (req, res) => {
+  console.log('got it')
+  res.end()
+})
+
+const getResponse = ({
+  data,
+  status = 'OK',
+  message = null,
+}) => ({
+  meta: {
+    status,
+    message,
+  },
+  data,
+})
+
+const moment = require('moment')
+
+const requestDate = moment().add('seconds', -123456789).format()
+const portingDate = moment().add('seconds', 123456789).format()
+router.get('/mnp', (req, res) => {
+  res.json(getResponse({
+    data: {
+      mnpNumber: '79859051251',
+      portingDate,
+      requestDate,
+      transferStatus: 'suspended',
+      donorOperator: {
+        name: "\"Your last slowpoke\"",
+      },
+      requestId: '5553555',
+      temporaryNumber: '79999991299',
+    },
+  }))
 })
 
 module.exports = router
