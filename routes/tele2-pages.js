@@ -17,7 +17,6 @@ const ContentNames = {
   TIZER: 'tizer',
   JOURNAL: 'journal',
   ROAMING: 'roaming',
-  BANNER: 'banner'
 }
 
 

@@ -202,33 +202,47 @@ router.get('/mia/offers', (req, res) => {
 let isConnected = false
 const getCallForwardingData = () => isConnected
   ? {
-    "absolute": {
-      "enabled": false,
-    },
-    "busy": {
-      "enabled": false,
-    },
-    "unanswered": {
-      "enabled": false,
-    },
-    "unreachable": {
-      "enabled": false,
-    }
+    unansweredDefaultDelay: 10,
+    options: [
+      {
+        type: "absolute",
+        "enabled": false,
+      },
+      {
+        type: "busy",
+        "enabled": false,
+      },
+      {
+        type: "unanswered",
+        "enabled": false,
+      },
+      {
+        type: "unreachable",
+        "enabled": false,
+      }
+    ],
   }
   : {
-    "absolute": {
-      "enabled": true,
-      "forwardingMsisdn": "79876543210"
-    },
-    "busy": {
-      "enabled": false,
-    },
-    "unanswered": {
-      "enabled": false,
-    },
-    "unreachable": {
-      "enabled": false,
-    }
+    unansweredDefaultDelay: 10,
+    options: [
+      {
+        type: "absolute",
+        "enabled": true,
+        "forwardingMsisdn": "79876543210"
+      },
+      {
+        type: "busy",
+        "enabled": false,
+      },
+      {
+        type: "unanswered",
+        "enabled": false,
+      },
+      {
+        type: "unreachable",
+        "enabled": false,
+      }
+    ],
   }
 
 router.get('/callforwarding', (req, res) => {
@@ -236,6 +250,105 @@ router.get('/callforwarding', (req, res) => {
     data: getCallForwardingData(),
   }))
   isConnected = !isConnected
+})
+
+router.patch('/callforwarding', (req, res) => {
+  res.json(getResponse({
+    data: null
+  }))
+  isConnected = !isConnected
+})
+
+let connected = [
+  {"msisdn":"79775255819"},
+  {"msisdn":"79773248849"},
+]
+let candidates = [
+  {"msisdn":"79773248847", errorMessage: "Особый текст ошибки"},
+  {"msisdn":"79776930497"},
+]
+let slaveNumbers = [
+  {"msisdn":"79773248849","state":"active"},
+  {"msisdn":"79773248847","state":"active"},
+  {"msisdn":"79777127959","state":""},
+  {"msisdn":"79775255819","state":"active"},
+  {"msisdn":"79775255818","state":""},
+  {"msisdn":"79777127960","state":""},
+  {"msisdn":"79776930497","state":"active"},
+]
+
+const getMsisdnFromSlaveNumbers = neededMsisdn => slaveNumbers.findIndex(({ msisdn }) => msisdn === neededMsisdn)
+
+router.get('/commonAccount', (req, res) => {
+  res.json(getResponse({
+    data: {
+      connected,
+      candidates,
+    },
+  }))
+})
+
+router.put('/commonAccount/members', (req, res) => {
+  const { target, master } = req.body
+  if (!connected.some((number) => number.master)) connected.push({ msisdn: master, master: true })
+  connected.push(slaveNumbers.find(({ msisdn }) => target === msisdn))
+
+  const candidateIndex = getMsisdnFromSlaveNumbers(target)
+  candidates = [...candidates.slice(0, candidateIndex), ...candidates.slice(candidateIndex + 1)]
+  res.json(getResponse({
+    data: { connected, candidates }
+  }))
+})
+
+router.delete('/commonAccount/members', (req, res) => {
+  const { target } = req.query
+  if (connected.length <= 2) {
+    connected.map((number) => {
+      delete number.master
+      candidates.push(number)
+    })
+    connected = []
+  } else {
+    const msisdnIndex = connected.findIndex(({ msisdn }) => msisdn === target)
+    const numberToDelete = connected[msisdnIndex]
+    console.log(numberToDelete, msisdnIndex)
+    if (numberToDelete) {
+      delete numberToDelete.master
+      candidates.push(numberToDelete)
+      connected = [...connected.slice(0, msisdnIndex), ...connected.slice(msisdnIndex + 1)]
+    }
+  }
+  res.json(getResponse({
+    data: connected,
+  }))
+})
+
+router.put('/commonAccount/master', (req, res) => {
+  const currentMaster = connected.find(({ master }) => master)
+  delete currentMaster.master
+
+  const { target } = req.body
+  const targetMaster = connected.find(({ msisdn }) => msisdn === target )
+  targetMaster.master = true
+  res.json(getResponse({
+    data: connected,
+  }))
+})
+
+router.get('/slaves', (req, res) => {
+  res.json(getResponse({
+    data: slaveNumbers,
+  }))
+})
+
+router.put('/slaves', (req, res) => {
+  const number = slaveNumbers.find(({ msisdn }) => msisdn === String(req.body))
+  number.state = 'pending'
+  setTimeout(() => (number.state = 'active'), 1000 * 20)
+  candidates.push(number)
+  res.json(getResponse({
+    data: slaveNumbers,
+  }))
 })
 
 module.exports = router
