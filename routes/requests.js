@@ -351,4 +351,36 @@ router.put('/slaves', (req, res) => {
   }))
 })
 
+const simStatuses = {
+  BLOCKED: 'BLOCKED',
+  SUSPENDED: 'SUSPENDED',
+  ACTIVATED: 'ACTIVATED',
+}
+let simStatus = simStatuses.SUSPENDED
+const toggleSimStatus = () => {
+  simStatus = simStatus === simStatuses.ACTIVATED ? simStatuses.SUSPENDED : simStatuses.ACTIVATED
+}
+router.put('/simStatus', (req, res) => {
+  const status = req.body
+  // simStatus = status
+  res.json(getResponse({
+    status: 'ERROR',
+    data: {
+      status: status.status
+    },
+  }))
+})
+
+router.get('/simStatus', (req, res) => {
+  const status = req.body
+  res.json(getResponse({
+    // message: 'Unlockability undefined',
+    // status: 'ERROR',
+    data: {
+      status: simStatus,
+      unlockability: true,
+    },
+  }))
+})
+
 module.exports = router
