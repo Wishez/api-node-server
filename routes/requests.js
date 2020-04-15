@@ -260,21 +260,23 @@ router.patch('/callforwarding', (req, res) => {
 })
 
 let connected = [
-  {"msisdn":"79775255819"},
+  {"msisdn":"79508408321"},
   {"msisdn":"79773248849"},
+  {"msisdn":"79775255819"},
+  {"msisdn":"79777127959", master: true},
 ]
 let candidates = [
   {"msisdn":"79773248847", errorMessage: "Особый текст ошибки"},
   {"msisdn":"79776930497"},
 ]
 let slaveNumbers = [
-  {"msisdn":"79773248849","state":"active"},
+  {"msisdn":"79773248849","state":"pending"},
   {"msisdn":"79773248847","state":"active"},
-  {"msisdn":"79777127959","state":""},
-  {"msisdn":"79775255819","state":"active"},
+  {"msisdn":"79777127959","state":"active"},
   {"msisdn":"79775255818","state":""},
+  {"msisdn":"79775255819","state":""},
   {"msisdn":"79777127960","state":""},
-  {"msisdn":"79776930497","state":"active"},
+  {"msisdn":"79776930497","state":"pending"},
 ]
 
 const getMsisdnFromSlaveNumbers = neededMsisdn => slaveNumbers.findIndex(({ msisdn }) => msisdn === neededMsisdn)
@@ -283,17 +285,17 @@ router.get('/commonAccount', (req, res) => {
   res.json(getResponse({
     data: {
       connected,
-      candidates,
+      available: candidates,
     },
   }))
 })
 
 router.put('/commonAccount/members', (req, res) => {
-  const { target, master } = req.body
+  const { member, master } = req.body
   if (!connected.some((number) => number.master)) connected.push({ msisdn: master, master: true })
-  connected.push(slaveNumbers.find(({ msisdn }) => target === msisdn))
+  connected.push(slaveNumbers.find(({ msisdn }) => member === msisdn))
 
-  const candidateIndex = getMsisdnFromSlaveNumbers(target)
+  const candidateIndex = getMsisdnFromSlaveNumbers(member)
   candidates = [...candidates.slice(0, candidateIndex), ...candidates.slice(candidateIndex + 1)]
   res.json(getResponse({
     data: { connected, candidates }
@@ -301,7 +303,7 @@ router.put('/commonAccount/members', (req, res) => {
 })
 
 router.delete('/commonAccount/members', (req, res) => {
-  const { target } = req.query
+  const { member } = req.body
   if (connected.length <= 2) {
     connected.map((number) => {
       delete number.master
@@ -309,9 +311,8 @@ router.delete('/commonAccount/members', (req, res) => {
     })
     connected = []
   } else {
-    const msisdnIndex = connected.findIndex(({ msisdn }) => msisdn === target)
+    const msisdnIndex = connected.findIndex(({ msisdn }) => msisdn === member)
     const numberToDelete = connected[msisdnIndex]
-    console.log(numberToDelete, msisdnIndex)
     if (numberToDelete) {
       delete numberToDelete.master
       candidates.push(numberToDelete)
@@ -325,10 +326,10 @@ router.delete('/commonAccount/members', (req, res) => {
 
 router.put('/commonAccount/master', (req, res) => {
   const currentMaster = connected.find(({ master }) => master)
-  delete currentMaster.master
+  if (currentMaster) delete currentMaster.master
 
-  const { target } = req.body
-  const targetMaster = connected.find(({ msisdn }) => msisdn === target )
+  const { member } = req.body
+  const targetMaster = connected.find(({ msisdn }) => msisdn === member )
   targetMaster.master = true
   res.json(getResponse({
     data: connected,
@@ -346,6 +347,15 @@ router.put('/slaves', (req, res) => {
   number.state = 'pending'
   setTimeout(() => (number.state = 'active'), 1000 * 20)
   candidates.push(number)
+  res.json(getResponse({
+    data: slaveNumbers,
+  }))
+})
+
+router.patch('/slaves', (req, res) => {
+  const { member } = req.body
+  const number = slaveNumbers.find(({ msisdn }) => msisdn === member)
+  number.state = ''
   res.json(getResponse({
     data: slaveNumbers,
   }))
