@@ -393,4 +393,32 @@ router.get('/simStatus', (req, res) => {
   }))
 })
 
+const moment = require('moment')
+router.get('/changeNumber', (req, res) => {
+  res.json(getResponse({
+    status: 'CHANGE_FORBIDDEN',
+    data: {
+      changeDay: moment().subtract(7, 'days').toISOString(),
+    },
+  }))
+})
+
+router.get('/profile', (req, res) => {
+  res.json(getResponse({
+    status: 'OK',
+    data: {
+      sitePrefix: "rostov",
+      siteId: "siteROSTOV",
+      fullName: "Тестовый Линииелс Зни 79989",
+      email: null,
+      avatar: null,
+      avatarId: null,
+      address: {},
+      clientType: "ololo",
+      mnpType: null,
+      virtualNumberConnected: false,
+    },
+  }))
+})
+
 module.exports = router
