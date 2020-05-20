@@ -421,4 +421,131 @@ router.get('/profile', (req, res) => {
   }))
 })
 
+const createNumbers = (quantity = 100000) => Array.from(Array(quantity)).map(
+  () => ({ number: `7${String(Math.floor(Math.random() * 999999999999)).substr(0, 10)}` })
+)
+const firstCategoryNumbers = createNumbers()
+const secondCategoryNumbers = createNumbers()
+const thirdCategoryNumbers = createNumbers()
+const categories = [
+  {
+    amount: 150,
+    id: 4,
+    numbers: thirdCategoryNumbers,
+  },
+  {
+    amount: 3000,
+    id: 2,
+    numbers: firstCategoryNumbers,
+  },
+  {
+    amount: 9000,
+    id: 3,
+    numbers: secondCategoryNumbers,
+  },
+]
+const lastIndeces = {}
+const getNumbersPortion = (category, count) => {
+  const { id, numbers } = category
+  const lastIndex = lastIndeces[id] || 0
+  const afterLastElementIndex = Number(lastIndex) + Number(count)
+  const numbersPortion  = numbers.slice(lastIndex, afterLastElementIndex)
+  if (!numbersPortion.length) return null
+
+  const reuslt = {
+    ...category,
+    numbers: numbersPortion,
+  }
+  lastIndeces[id] = afterLastElementIndex
+  return reuslt
+}
+
+const compact = require('lodash/compact')
+
+router.get('/changenumber/numbers', (req, res) => {
+  const { count = 20, category } = req.query
+  let result = categories
+  if (count && category) {
+    const specialCategory = categories.find(({ id }) => category == id) || {}
+    result = [getNumbersPortion(specialCategory, count)]
+  } else if (count) result = categories.map(category => getNumbersPortion(category, count))
+  res.json(getResponse({
+    data: {
+      categories: compact(result),
+    },
+  }))
+})
+
+let codeValidTo
+let quantityAttempts = 0
+router.put('/changenumber/numbers', (req, res) => {
+  const { code } = req.body
+  let status = 'OK'
+  if (!codeValidTo) {
+    codeValidTo = Number(moment().add('minutes', 1).format('x'))
+  } else {
+    const isExpired = (moment().diff(codeValidTo, 's') * -1) <= 0
+    status = Math.round(Math.random()) ? 'CODE_NOT_FOUND' : 'CODE_ALREADY_EXIST'
+    if (isExpired) codeValidTo = undefined
+  }
+  const isCodeFilled = code && code === '123456'
+  if (code && code === '123456') {
+    status = 'OK'
+    quantityAttempts = 0
+  }
+  else if (code && quantityAttempts === 1) status = 'FAILED_ATTEMPTS'
+  else if (code) {
+    status = 'BAD_CODE'
+    quantityAttempts += 1
+  }
+  res.json(getResponse({
+    status,
+    data: {
+      codeValidTo,
+    },
+  }))
+})
+
+router.get('/changenumber/reserve', (req, res) => {
+  res.json(getResponse({
+    status: 'TEMPORARY_FORBIDDEN',
+    data: {
+      availableSince: moment().add('days', '10').toISOString(),
+    }
+  }))
+})
+
+router.post('/changenumber/reserve', (req, res) => {
+  res.json(getResponse({
+    status: 'OK',
+    data: null
+  }))
+})
+
+router.get('/changenumber/availability', (req, res) => {
+  res.json(getResponse({
+    status: 'OK',
+    data: {
+      number: ''//'79859051255',
+    },
+  }))
+})
+
+
+router.get('/changenumber/balance', (req, res) => {
+  res.json(getResponse({
+    data: { value: 3000 },
+  }))
+})
+
+router.get('/changenumber/random-portion-of-numbers', (req, res) => {
+  const randomCategoryId = Math.floor(Math.random() * categories.length)
+  const count = 20
+  res.json(getResponse({
+    data: {
+      categories: [getNumbersPortion(categories[randomCategoryId], count)]
+    },
+  }))
+})
+
 module.exports = router
