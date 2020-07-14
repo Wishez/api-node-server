@@ -1,10 +1,11 @@
+const moment = require('moment')
 const router = require('express').Router()
 
 const getResponse = ({
   data,
   status = 'OK',
   message = null,
-}) => ({
+} = {}) => ({
   meta: {
     status,
     message,
@@ -393,7 +394,6 @@ router.get('/simStatus', (req, res) => {
   }))
 })
 
-const moment = require('moment')
 router.get('/changeNumber', (req, res) => {
   res.json(getResponse({
     status: 'CHANGE_FORBIDDEN',
@@ -414,9 +414,37 @@ router.get('/profile', (req, res) => {
       avatar: null,
       avatarId: null,
       address: {},
-      clientType: "ololo",
-      mnpType: null,
+      clientType: "i",
+      mnpType: 'out',
       virtualNumberConnected: false,
+    },
+  }))
+})
+
+router.post('/codeconfirm', (req, res) => {
+  res.json(getResponse({
+    data: req.body.validationCode
+  }))
+})
+
+router.get('/coderequest', (req, res) => {
+  res.json(getResponse())
+})
+
+const requestDate = moment().add('seconds', -123456789).format()
+const portingDate = moment().add('seconds', 123456789).format()
+router.get('/mnp', (req, res) => {
+  res.json(getResponse({
+    data: {
+      mnpNumber: '79859051251',
+      portingDate,
+      requestDate,
+      transferStatus: 'suspended',
+      donorOperator: {
+        name: "\"Your last slowpoke\"",
+      },
+      requestId: '5553555',
+      temporaryNumber: '79999991299',
     },
   }))
 })
@@ -460,6 +488,12 @@ const getNumbersPortion = (category, count) => {
   return reuslt
 }
 
+router.get('/changenumber/cards', (req, res) => {
+  res.json(getResponse({
+    data: [],
+  }))
+})
+
 const compact = require('lodash/compact')
 
 router.get('/changenumber/numbers', (req, res) => {
@@ -470,9 +504,7 @@ router.get('/changenumber/numbers', (req, res) => {
     result = [getNumbersPortion(specialCategory, count)]
   } else if (count) result = categories.map(category => getNumbersPortion(category, count))
   res.json(getResponse({
-    data: {
-      categories: compact(result),
-    },
+    data: compact(result),
   }))
 })
 
@@ -480,12 +512,16 @@ let codeValidTo
 let quantityAttempts = 0
 router.put('/changenumber/numbers', (req, res) => {
   const { code } = req.body
+  const payload = {}
   let status = 'OK'
   if (!codeValidTo) {
-    codeValidTo = Number(moment().add('minutes', 1).format('x'))
+    codeValidTo = Number(moment().add('seconds', 30).format('x'))
   } else {
     const isExpired = (moment().diff(codeValidTo, 's') * -1) <= 0
-    status = Math.round(Math.random()) ? 'CODE_NOT_FOUND' : 'CODE_ALREADY_EXIST'
+    if (Math.round(Math.random())) {
+      payload.codeValidTo = codeValidTo
+      status = 'CODE_NOT_FOUND'
+    } else status = 'CODE_ALREADY_EXIST'
     if (isExpired) codeValidTo = undefined
   }
   const isCodeFilled = code && code === '123456'
@@ -493,22 +529,20 @@ router.put('/changenumber/numbers', (req, res) => {
     status = 'OK'
     quantityAttempts = 0
   }
-  else if (code && quantityAttempts === 1) status = 'FAILED_ATTEMPTS'
+  else if (code && quantityAttempts) status = 'FAILED_ATTEMPTS'
   else if (code) {
     status = 'BAD_CODE'
     quantityAttempts += 1
   }
   res.json(getResponse({
     status,
-    data: {
-      codeValidTo,
-    },
+    data: payload,
   }))
 })
 
 router.get('/changenumber/reserve', (req, res) => {
   res.json(getResponse({
-    status: 'TEMPORARY_FORBIDDEN',
+    status: 'OK',
     data: {
       availableSince: moment().add('days', '10').toISOString(),
     }
@@ -526,7 +560,8 @@ router.get('/changenumber/availability', (req, res) => {
   res.json(getResponse({
     status: 'OK',
     data: {
-      number: ''//'79859051255',
+      number: '',//'79859051255',
+      availableSince: moment().add('days', '10').toISOString(),
     },
   }))
 })
@@ -534,17 +569,212 @@ router.get('/changenumber/availability', (req, res) => {
 
 router.get('/changenumber/balance', (req, res) => {
   res.json(getResponse({
-    data: { value: 3000 },
+    data: { value: 153000 },
   }))
 })
 
 router.get('/changenumber/random-portion-of-numbers', (req, res) => {
   const randomCategoryId = Math.floor(Math.random() * categories.length)
   const count = 20
+  const category = getNumbersPortion(categories[randomCategoryId], count)
+  // category.numbers = category.numbers.slice(0, 18)
+  res.json(getResponse({
+    data: [category]
+  }))
+})
+
+const oneHourAgoDate = moment().add('hours', 1).format()
+const notices = [
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d2",
+    "type": "gifts",
+    "position": "tariff",
+    "description": "тариф1",
+    "url": "https://tele2.ru/nastroy-tariff#sliders",
+    "rateId": "13580",
+    "services": [],
+    "priority": 1,
+    "important": false,
+    "read": false,
+    "createdAt": "2020-06-04T23:58:58.56Z",
+    integrationId: "VFRFd01YeHpaV3htYzJWeWRtbGpaWHhrWldaaGRXeDBmRzUxYkd4OE1IeHNhMTlqYjI1MFpXNTBYMmR5Y0h6UXU5QzZmREF1TUh4U01qazFfMjAwMDUzNzc4MTgxXzE1ODQ0MzI5NTE4OTY=",
+    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d3",
+    "type": "gifts",
+    "position": "tariff",
+    "description": "тариф1",
+    "url": "https://tele2.ru/nastroy-tariff#sliders",
+    "rateId": "13581",
+    "services": [],
+    "priority": 1,
+    "integrationId": "VFRFd01YeHpaV3htYzJWeWRtbGpaWHhrWldaaGRXeDBmRzUxYkd4OE1IeHNhMTlqYjI1MFpXNTBYMmR5Y0h6UXU5QzZmREF1TUh4U01qazFfMjAwMDUzNzc4MTgxXzE1ODQ0MzI5NTE4OTY=",
+    "important": true,
+    "read": true,
+    "createdAt": moment().subtract('days', 1),
+    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d",
+  //   "type": "gifts",
+  //   "position": "services",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": 'https://msk.tele2.ru/option/voice-mail',
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": false,
+  //   "read": false,
+  //   "createdAt": moment().subtract('month', 1),
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d1",
+  //   "type": "gifts",
+  //   "position": "tariff",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": 'https://msk.tele2.ru/tariffs',
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": false,
+  //   "read": true,
+  //   "createdAt": "2019-11-06T11:32:40.648Z",
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d6",
+  //   "type": "gifts",
+  //   "position": "services",
+  //   "description": "Самая важная нотификация!",
+  //   "url": 'https://msk.tele2.ru/lk/services',
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 2,
+  //   "important": true,
+  //   "read": true,
+  //   "createdAt": oneHourAgoDate,
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d74",
+  //   "type": "gifts",
+  //   "position": "balance",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": null,
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": true,
+  //   "read": false,
+  //   "createdAt": oneHourAgoDate,
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d73",
+  //   "type": "gifts",
+  //   "position": "balance",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": null,
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": true,
+  //   "read": false,
+  //   "createdAt": oneHourAgoDate,
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d7",
+  //   "type": "gifts",
+  //   "position": "balance",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": null,
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": true,
+  //   "read": false,
+  //   "createdAt": oneHourAgoDate,
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d72",
+  //   "type": "gifts",
+  //   "position": "balance",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": null,
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": true,
+  //   "read": false,
+  //   "createdAt": oneHourAgoDate,
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // },
+  // {
+  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d71",
+  //   "type": "gifts",
+  //   "position": "balance",
+  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+  //   "url": null,
+  //   "rateId": "14855",
+  //   "services": [
+  //     "3007"
+  //   ],
+  //   "priority": 1,
+  //   "important": true,
+  //   "read": false,
+  //   "createdAt": oneHourAgoDate,
+  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  // }
+]
+router.get('/notices', (req, res) => {
   res.json(getResponse({
     data: {
-      categories: [getNumbersPortion(categories[randomCategoryId], count)]
-    },
+      unreadCount: notices.length,
+      notices,
+    }
+  }))
+})
+
+router.patch('/notices', (req, res) => {
+  res.json(getResponse({
+    data: {
+      unreadCount: notices.length,
+      notices,
+    }
+  }))
+})
+
+router.get('/not-found/active', (req, res) => {
+  res.status(404)
+  res.json(getResponse({
+    status: 'NOT_FOUND',
+    data: []
+  }))
+})
+
+router.get('/not-found/cards', (req, res) => {
+  // res.status(404)
+  res.json(getResponse({
+    status: 'OK',
+    data: []
   }))
 })
 

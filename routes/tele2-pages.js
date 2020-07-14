@@ -17,6 +17,13 @@ const ContentNames = {
   TIZER: 'tizer',
   JOURNAL: 'journal',
   ROAMING: 'roaming',
+  FEEDBACK: 'feedback',
+  PROMO2: 'promo2',
+  CONNECTION_REQUEST: 'connection-request1',
+  OPROS: 'opros',
+  RESUME: 'resume',
+  PROFILE_SETTINGS: 'profileSettings',
+  // PAYMENTS: 'payments'
 }
 
 
@@ -59,11 +66,10 @@ router.get('/journal/category/mobile', (req, res) => {
 
 router.get('/help', (req, res) => {
   if (req.query.format === 'json') res.json(contents[ContentNames.HELP])
-  
   // res.send(loadFile('/content/ocwidget.js'))
 })
 
-router.get('/home', (req, res) => {
+router.get('/home/test', (req, res) => {
   if (req.query.format === 'json') res.json(contents[ContentNames.HOME])
 })
 
@@ -95,6 +101,22 @@ router.get('/banner|/lk', (req, res) => {
   if (req.query.format === 'json') res.json(contents[ContentNames.BANNER])
 })
 
+const configs = [
+  { url: '/feedback', contentName: ContentNames.FEEDBACK },
+  { url: '/promo2', contentName: ContentNames.PROMO2 },
+  { url: '/opros', contentName: ContentNames.OPROS },
+  { url: '/resume', contentName: ContentNames.RESUME },
+  { url: '/connection-request1', contentName: ContentNames.CONNECTION_REQUEST },
+  { url: '/profile-settings', contentName: ContentNames.PROFILE_SETTINGS },
+  { url: '/payments', contentName: ContentNames.PAYMENTS },
+]
+configs.forEach(({ url, contentName }) => {
+  router.get(url, (req, res) => {
+    if (req.query.format === 'json') res.json(contents[contentName])
+  })
+})
+
+
 router.get('/check', (req, res) => {
   console.log('got it')
   res.end()
@@ -112,24 +134,5 @@ const getResponse = ({
   data,
 })
 
-const moment = require('moment')
-
-const requestDate = moment().add('seconds', -123456789).format()
-const portingDate = moment().add('seconds', 123456789).format()
-router.get('/mnp', (req, res) => {
-  res.json(getResponse({
-    data: {
-      mnpNumber: '79859051251',
-      portingDate,
-      requestDate,
-      transferStatus: 'suspended',
-      donorOperator: {
-        name: "\"Your last slowpoke\"",
-      },
-      requestId: '5553555',
-      temporaryNumber: '79999991299',
-    },
-  }))
-})
 
 module.exports = router
