@@ -421,13 +421,31 @@ router.get('/profile', (req, res) => {
   }))
 })
 
-router.post('/codeconfirm', (req, res) => {
+let lastCode
+let attemptCount = 2
+router.post('/code', (req, res) => {
+  res.status(404)
+
+  const { validateCode } = req.body
+  if (attemptCount === 0 && validateCode !== lastCode) attemptCount = 2
+  else if (attemptCount !== 0) attemptCount -= 1
+  lastCode = validateCode
+
   res.json(getResponse({
-    data: req.body.validationCode
+    message: 'Ещё разочек 404ю тесчу',
+    data: {
+      attemptCount,
+    },
   }))
 })
 
-router.get('/coderequest', (req, res) => {
+router.get('/code', (req, res) => {
+  res.json(getResponse({
+    message: 'четыреста четыре',
+  }))
+})
+
+router.post('/changenumber/identification', (req, res) => {
   res.json(getResponse())
 })
 
@@ -442,6 +460,10 @@ router.get('/mnp', (req, res) => {
       transferStatus: 'suspended',
       donorOperator: {
         name: "\"Your last slowpoke\"",
+      },
+      lastHistoryEvent: {
+        description: 'Заявка на перенос номера бла бла бла...',
+        date: moment().format(),
       },
       requestId: '5553555',
       temporaryNumber: '79999991299',
@@ -494,6 +516,10 @@ router.get('/changenumber/cards', (req, res) => {
   }))
 })
 
+router.post('/token', (req, res) => {
+  res.status(401)
+  res.json({"error":"msisdn_not_found","error_description":"User temporarily disabled"})
+})
 const compact = require('lodash/compact')
 
 router.get('/changenumber/numbers', (req, res) => {
@@ -504,7 +530,7 @@ router.get('/changenumber/numbers', (req, res) => {
     result = [getNumbersPortion(specialCategory, count)]
   } else if (count) result = categories.map(category => getNumbersPortion(category, count))
   res.json(getResponse({
-    data: compact(result),
+    data: null//compact(result),
   }))
 })
 
@@ -519,13 +545,12 @@ router.put('/changenumber/numbers', (req, res) => {
   } else {
     const isExpired = (moment().diff(codeValidTo, 's') * -1) <= 0
     if (Math.round(Math.random())) {
-      payload.codeValidTo = codeValidTo
       status = 'CODE_NOT_FOUND'
     } else status = 'CODE_ALREADY_EXIST'
-    if (isExpired) codeValidTo = undefined
+    if (isExpired) codeValidTo = Number(moment().add('seconds', 30).format('x'))
   }
   const isCodeFilled = code && code === '123456'
-  if (code && code === '123456') {
+  if (isCodeFilled) {
     status = 'OK'
     quantityAttempts = 0
   }
@@ -534,6 +559,7 @@ router.put('/changenumber/numbers', (req, res) => {
     status = 'BAD_CODE'
     quantityAttempts += 1
   }
+  payload.codeValidTo = codeValidTo
   res.json(getResponse({
     status,
     data: payload,
@@ -602,7 +628,7 @@ const notices = [
   },
   {
     "id": "bc54d7-9feec247d-38502b9-ff2174e16d3",
-    "type": "gifts",
+    "type": "balance",
     "position": "tariff",
     "description": "тариф1",
     "url": "https://tele2.ru/nastroy-tariff#sliders",
@@ -615,134 +641,134 @@ const notices = [
     "createdAt": moment().subtract('days', 1),
     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
   },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d",
-  //   "type": "gifts",
-  //   "position": "services",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": 'https://msk.tele2.ru/option/voice-mail',
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": false,
-  //   "read": false,
-  //   "createdAt": moment().subtract('month', 1),
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d1",
-  //   "type": "gifts",
-  //   "position": "tariff",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": 'https://msk.tele2.ru/tariffs',
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": false,
-  //   "read": true,
-  //   "createdAt": "2019-11-06T11:32:40.648Z",
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d6",
-  //   "type": "gifts",
-  //   "position": "services",
-  //   "description": "Самая важная нотификация!",
-  //   "url": 'https://msk.tele2.ru/lk/services',
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 2,
-  //   "important": true,
-  //   "read": true,
-  //   "createdAt": oneHourAgoDate,
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d74",
-  //   "type": "gifts",
-  //   "position": "balance",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": null,
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": true,
-  //   "read": false,
-  //   "createdAt": oneHourAgoDate,
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d73",
-  //   "type": "gifts",
-  //   "position": "balance",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": null,
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": true,
-  //   "read": false,
-  //   "createdAt": oneHourAgoDate,
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d7",
-  //   "type": "gifts",
-  //   "position": "balance",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": null,
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": true,
-  //   "read": false,
-  //   "createdAt": oneHourAgoDate,
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d72",
-  //   "type": "gifts",
-  //   "position": "balance",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": null,
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": true,
-  //   "read": false,
-  //   "createdAt": oneHourAgoDate,
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // },
-  // {
-  //   "id": "bc54d7-9feec247d-38502b9-ff2174e16d71",
-  //   "type": "gifts",
-  //   "position": "balance",
-  //   "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
-  //   "url": null,
-  //   "rateId": "14855",
-  //   "services": [
-  //     "3007"
-  //   ],
-  //   "priority": 1,
-  //   "important": true,
-  //   "read": false,
-  //   "createdAt": oneHourAgoDate,
-  //    icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
-  // }
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d",
+    "type": "balance",
+    "position": "services",
+    "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+    "url": 'https://msk.tele2.ru/option/voice-mail',
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": false,
+    "read": false,
+    "createdAt": moment().subtract('month', 1),
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d1",
+    "type": "tryAndBuy",
+    "position": "tryAndBuy",
+    "description": "tryAndBuy, important == false и read === false",
+    "url": 'https://msk.tele2.ru/tariffs',
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": false,
+    "read": false,
+    "createdAt": "2019-11-06T11:32:40.648Z",
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d6",
+    "type": "balance",
+    "position": "balane",
+    "description": "Самая важная нотификация!",
+    "url": 'https://msk.tele2.ru/lk/services',
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 2,
+    "important": true,
+    "read": true,
+    "createdAt": oneHourAgoDate,
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d74",
+    "type": "balance",
+    "position": "balance",
+    "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+    "url": null,
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": true,
+    "read": false,
+    "createdAt": oneHourAgoDate,
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d73",
+    "type": "gifts",
+    "position": "balance",
+    "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+    "url": null,
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": true,
+    "read": false,
+    "createdAt": oneHourAgoDate,
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d7",
+    "type": "gifts",
+    "position": "balance",
+    "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+    "url": null,
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": true,
+    "read": false,
+    "createdAt": oneHourAgoDate,
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d72",
+    "type": "gifts",
+    "position": "balance",
+    "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+    "url": null,
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": true,
+    "read": false,
+    "createdAt": oneHourAgoDate,
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  },
+  {
+    "id": "bc54d7-9feec247d-38502b9-ff2174e16d71",
+    "type": "gifts",
+    "position": "balance",
+    "description": "Вам доступен день бесплатного интернета в роуминге с опцией «Безлимитный интернет за границей».",
+    "url": null,
+    "rateId": "14855",
+    "services": [
+      "3007"
+    ],
+    "priority": 1,
+    "important": true,
+    "read": false,
+    "createdAt": oneHourAgoDate,
+     icon: "https://tele2.ru/api/media/asset?mediaId=m2760013"
+  }
 ]
 router.get('/notices', (req, res) => {
   res.json(getResponse({
@@ -750,6 +776,13 @@ router.get('/notices', (req, res) => {
       unreadCount: notices.length,
       notices,
     }
+  }))
+})
+
+router.delete('/tryandbuy', (req, res) => {
+  res.json(getResponse({
+    // status: 'ERROR',
+    data: null,
   }))
 })
 
@@ -771,6 +804,22 @@ router.get('/not-found/active', (req, res) => {
 })
 
 router.get('/not-found/cards', (req, res) => {
+  // res.status(404)
+  res.json(getResponse({
+    status: 'OK',
+    data: []
+  }))
+})
+
+router.get('/charges', (req, res) => {
+  // res.status(404)
+  res.json(getResponse({
+    status: 'OK',
+    data: [{"amount":{"amount":765.00,"currency":"RUB"},"startMonth":"2020-08","endMonth":"2020-09","type":"SUBSCRIPTION_FEE","typeName":"Абонентская плата","consumingServices":null,"subGroups":[{"name":"","amount":{"amount":765.00,"currency":"RUB"},"consumingServices":[{"billingServiceId":11527,"billingServiceName":"Мой бизнес L","amount":{"amount":765.00,"currency":"RUB"}}]}]},{"amount":{"amount":6.00,"currency":"RUB"},"startMonth":"2020-08","endMonth":"2020-09","type":"CALLS","typeName":"Звонки","consumingServices":null,"subGroups":[{"name":"","amount":{"amount":6.00,"currency":"RUB"},"consumingServices":[{"billingServiceId":1,"billingServiceName":"Исходящие звонки по России","amount":{"amount":6.00,"currency":"RUB"}}]}]}],
+  }))
+})
+
+router.get('/payments', (req, res) => {
   // res.status(404)
   res.json(getResponse({
     status: 'OK',

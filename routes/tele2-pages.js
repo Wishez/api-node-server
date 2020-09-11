@@ -23,7 +23,7 @@ const ContentNames = {
   OPROS: 'opros',
   RESUME: 'resume',
   PROFILE_SETTINGS: 'profileSettings',
-  // PAYMENTS: 'payments'
+  PAYMENTS: 'payments'
 }
 
 
@@ -39,69 +39,24 @@ const contents = Object.values(ContentNames)
     [key]: getContent(key),
   }), {})
 
-router.get('/tariff/everywhere-online', (req, res) => {
-  const { format } = req.query
-  if (format === 'json') res.json(contents[ContentNames.EVERYWHERE])
-})
-
-router.get('/journal/category/mobile', (req, res) => {
-  const { format } = req.query
-  if (format === 'json') res.json(contents[ContentNames.MOBILE])
-})
-
-router.get('/tariff/premium', (req, res) => {
-  const { format } = req.query
-  if (format === 'json') res.json(contents[ContentNames.PREMIUM])
-})
-
-router.get('/tariff/classic', (req, res) => {
-  const { format } = req.query
-  if (format === 'json') res.json(contents[ContentNames.CLASSIC])
-})
-
-router.get('/journal/category/mobile', (req, res) => {
-  const { format } = req.query
-  if (format === 'json') res.json(contents[ContentNames.MOBILE_CATEGORY])
-})
-
-router.get('/help', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.HELP])
-  // res.send(loadFile('/content/ocwidget.js'))
-})
-
-router.get('/home/test', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.HOME])
-})
-
 router.get('/search', (req, res) => {
   res.json(searchResult)
 })
 
-router.get('/tariff/online', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.ONLINE])
-})
-
-router.get('/tizer', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.TIZER])
-})
-
-router.get('/mobile/roaming', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.TIZER])
-})
-
-router.get('/journal', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.JOURNAL])
-})
-
-router.get('/roaming', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.ROAMING])
-})
-
-router.get('/banner|/lk', (req, res) => {
-  if (req.query.format === 'json') res.json(contents[ContentNames.BANNER])
-})
-
 const configs = [
+  { url: '/tariff/everywhere-online', contentName: ContentNames.EVERYWHERE },
+  { url: '/tariff/classic', contentName: ContentNames.CLASSIC },
+  { url: '/tariff/premium', contentName: ContentNames.PREMIUM },
+  { url: '/journal/category/mobile', contentName: ContentNames.MOBILE },
+  { url: '/home/test', contentName: ContentNames.HOME },
+  { url: '/help', contentName: ContentNames.HELP },
+  { url: '/journal/category/mobile', contentName: ContentNames.MOBILE_CATEGORY },
+  { url: '/mobile/roaming', contentName: ContentNames.ROAMING },
+  { url: '/tizer', contentName: ContentNames.TIZER },
+  { url: '/tariff/online', contentName: ContentNames.ONLINE },
+  { url: '/banner|/lk', contentName: ContentNames.BANNER },
+  { url: '/roaming', contentName: ContentNames.ROAMING },
+  { url: '/journal', contentName: ContentNames.JOURNAL },
   { url: '/feedback', contentName: ContentNames.FEEDBACK },
   { url: '/promo2', contentName: ContentNames.PROMO2 },
   { url: '/opros', contentName: ContentNames.OPROS },
@@ -116,23 +71,9 @@ configs.forEach(({ url, contentName }) => {
   })
 })
 
-
 router.get('/check', (req, res) => {
   console.log('got it')
   res.end()
 })
-
-const getResponse = ({
-  data,
-  status = 'OK',
-  message = null,
-}) => ({
-  meta: {
-    status,
-    message,
-  },
-  data,
-})
-
 
 module.exports = router

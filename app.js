@@ -30,6 +30,10 @@ app.get('/test', (req, res) => {
   res.sendFile(_.resolvePath('static/templates/test/index.html'))
 })
 
+app.get('/webim-chat', (req, res) => {
+  res.sendFile(_.resolvePath('static/templates/test/webim.html'))
+})
+
 app.get('/', (req, res) => {
   res.sendFile(_.resolvePath('static/index.html'))
 })
