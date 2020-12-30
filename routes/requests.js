@@ -415,7 +415,7 @@ router.get('/profile', (req, res) => {
       avatarId: null,
       address: {},
       clientType: "i",
-      mnpType: 'out',
+      mnpType: 'in',
       virtualNumberConnected: false,
     },
   }))
@@ -447,6 +447,12 @@ router.get('/code', (req, res) => {
 
 router.post('/changenumber/identification', (req, res) => {
   res.json(getResponse())
+})
+
+router.get('/esia/identify', (req, res) => {
+  res.json(getResponse({
+    data: { status: true },
+  }))
 })
 
 const requestDate = moment().add('seconds', -123456789).format()
@@ -824,6 +830,36 @@ router.get('/payments', (req, res) => {
   res.json(getResponse({
     status: 'OK',
     data: []
+  }))
+})
+
+const articlesIds = ["a3280040", "a4420008", "a4400004", "a4400003", "a4370003", "a4360051", "a2690151", "a4360038", "a3610011", "a3590012", "a3550045", "a3566677", "a3566650", "a4300005", "a4360001", "a4350008", "a4340008", "a4340001", "a4320006", "a4320008", "a4310001", "a4300020", "a4300007", "a4290034", "a4290001", "a4260004", "a4250005", "a4230030", "a4230015", "a4200007", "a4200012", "a4170007", "a4160100", "a4160019", "a4150001", "a4140012", "a4130043", "a4120050", "a4100033", "a4100015", "a4090086", "a4090010", "a4080010", "a4080004", "a4060023", "a4020048", "a3990001", "a3980062", "a3980007", "a3970042", "a3970018", "a3960005", "a3940070", "a3930070", "a3930035", "a3920021", "a3880016", "a3870046", "a3850040", "a3850009", "a3820009", "a3790051", "a3790005", "a3770018", "a3760004", "a3750007", "a3740007", "a3720004", "a3700046", "a3700034", "a3690031", "a3690020", "a2830040", "a3670045", "a3670024", "a3860037", "a3650009", "a3620066", "a3620028"]
+const likes = articlesIds.map((itemId) => ({
+  itemId,
+  totalLikes: Math.random() * 10001 * .5|0,
+}))
+router.get('/journal/likes', (req, res) => {
+  res.json(getResponse({
+    data: {
+      items: likes,
+    }
+  }))
+})
+
+router.get('/article/likes', (req, res) => {
+  res.json(getResponse({
+    data: {
+      totalLikes: Math.random() * 10001 * .5|0,
+      userReaction: '',
+    }
+  }))
+})
+
+router.post('/journal/likes', (req, res) => {
+  res.json(getResponse({
+    data: {
+      items: likes,
+    }
   }))
 })
 

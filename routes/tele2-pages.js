@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const fs = require('fs')
-const axios = require('axios');
 const searchResult = require('./searchResult')
 
 const loadFile = (url) => fs.readFileSync(__dirname + url, { encoding: 'utf-8' })
@@ -23,7 +22,11 @@ const ContentNames = {
   OPROS: 'opros',
   RESUME: 'resume',
   PROFILE_SETTINGS: 'profileSettings',
-  PAYMENTS: 'payments'
+  PAYMENTS: 'payments',
+  INTERNET: 'internet',
+  HOME28: 'home28',
+  TARIFFS: 'tariffs',
+  HOME2: 'home2',
 }
 
 
@@ -64,6 +67,10 @@ const configs = [
   { url: '/connection-request1', contentName: ContentNames.CONNECTION_REQUEST },
   { url: '/profile-settings', contentName: ContentNames.PROFILE_SETTINGS },
   { url: '/payments', contentName: ContentNames.PAYMENTS },
+  { url: '/market/internet', contentName: ContentNames.INTERNET },
+  { url: '/home28', contentName: ContentNames.HOME28 },
+  { url: '/tariffs', contentName: ContentNames.TARIFFS },
+  { url: '/home2', contentName: ContentNames.HOME2 },
 ]
 configs.forEach(({ url, contentName }) => {
   router.get(url, (req, res) => {
