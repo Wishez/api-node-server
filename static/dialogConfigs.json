@@ -1,0 +1,166 @@
+{
+  "dialogsConfigs": [{
+      "submitConfig": {
+        "formId": "addFrameForm",
+        "submitterId": "IFRAME"
+      },
+      "dialogConfig": {
+        "popupId": "addFrame",
+        "isOpenDialogButtonImage": true,
+        "buttonName": "iframe.png",
+        "buttonId": "submitAddFrameForm",
+        "submitText": "Принять",
+        "fields": [{
+            "labelText": "Ссылка на видео",
+            "name": "iframeSrc",
+            "placeholder": "https://www.youtube.com/embed/G9FGgwCQ22w",
+            "defaultValue": "https://www.youtube.com/embed"
+          },
+          {
+            "name": "contentType",
+            "labelText": "Тип контента",
+            "choices": [{
+                "value": "iframe",
+                "description": "Видео"
+              },
+              {
+                "value": "videoText",
+                "description": "Видео - Абзац"
+              },
+              {
+                "value": "textVideo",
+                "description": "Абзац - Видео"
+              }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "submitConfig": {
+        "formId": "addHeadingForm",
+        "submitterId": "HEADING"
+      },
+      "dialogConfig": {
+        "popupId": "addHeading",
+        "isOpenDialogButtonImage": true,
+        "buttonName": "heading.png",
+        "buttonId": "submitAddHeadingForm",
+        "submitText": "Принять",
+        "fields": [{
+            "labelText": "Уровень заголовка",
+            "defaultValue": 2,
+            "type": "number",
+            "min": 1,
+            "max": 6,
+            "name": "level"
+          },
+          {
+            "name": "contentType",
+            "labelText": "Тип контента",
+            "choices": [{
+                "value": "heading",
+                "description": "Заголовок"
+              },
+              {
+                "value": "headingText",
+                "description": "Заголовок - Абзац"
+              },
+              {
+                "value": "textHeading",
+                "description": "Абзац - Заголовок"
+              }
+            ]
+          },
+          {
+            "name": "headingWeight",
+            "labelText": "Жирность заголовка",
+            "choices": [
+              { "value": "bold", "description": "Жирный" },
+              { "value": "normal", "description": "Нормальный" }
+            ]
+          },
+          {
+            "name": "direction",
+            "labelText": "Выравнивание блоков",
+            "choices": [
+              { "value": "column", "description": "В колонку" },
+              { "value": "row", "description": "В одну строку" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "submitConfig": {
+        "formId": "addShortcutForm",
+        "submitterId": "SHORTCUT"
+      },
+      "dialogConfig": {
+        "popupId": "addShortcut",
+        "isOpenDialogButtonImage": true,
+        "buttonName": "shortcut.png",
+        "buttonId": "submitAddShortcutForm",
+        "submitText": "Принять",
+        "fields": [{
+            "name": "sectionName",
+            "labelText": "Тип шорткода",
+            "select": [
+              { "value": "", "description": "-- Выберите тип шорткода --" },
+              { "value": "promoblock", "description": "promoblock -- рекламный блок" },
+              { "value": "webimbutton", "description": "webimbutton -- кнопка чата Webim" }
+            ]
+          },
+          {
+            "labelText": "Заголовок",
+            "name": "title",
+            "placeholder": "Мобильное приложение «‎Мой Теле2»‎",
+            "defaultValue": "Мобильное приложение «‎Мой Теле2»‎",
+            "sectionName": "promoblock"
+          },
+          {
+            "labelText": "Контент",
+            "name": "content",
+            "placeholder": "Легче всего делиться гигабайтами в приложение...",
+            "isContent": true,
+            "sectionName": "promoblock"
+          },
+          {
+            "labelText": "Ссылка",
+            "name": "link",
+            "placeholder": "https://tele2.ru/my",
+            "sectionName": "promoblock"
+          },
+          {
+            "labelText": "Текст ссылки",
+            "name": "buttonText",
+            "placeholder": "Попробовать",
+            "sectionName": "promoblock"
+          },
+          {
+            "labelText": "Открыть ссылку в новой вкладке?",
+            "name": "isInNewWindow",
+            "type": "checkbox",
+            "sectionName": "promoblock"
+          },
+          {
+            "labelText": "Текст кнопки",
+            "name": "buttonText",
+            "placeholder": "Задать вопрос",
+            "defaultValue": "Задать вопрос",
+            "sectionName": "webimbutton"
+          },
+          {
+            "labelText": "Значение location для конфигурации чата webim в неавторизованной зоне",
+            "name": "location",
+            "placeholder": "site_tele2",
+            "defaultValue": "site_tele2",
+            "sectionName": "webimbutton"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 const moment = require('moment')
+const fs = require('fs')
 const router = require('express').Router()
+const { resolvePath } = require('../helpers')
 
 const getResponse = ({
   data,
@@ -855,12 +857,9 @@ router.get('/article/likes', (req, res) => {
   }))
 })
 
-router.post('/journal/likes', (req, res) => {
-  res.json(getResponse({
-    data: {
-      items: likes,
-    }
-  }))
+router.get('/dialogsConfigs', (req, res) => {
+  const dialogsConfigs = fs.readFileSync(resolvePath('static/dialogConfigs.json'), 'utf-8')
+  res.json(JSON.parse(dialogsConfigs))
 })
 
 module.exports = router
