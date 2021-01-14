@@ -99,6 +99,8 @@ CKEDITOR.editorConfig = function(config, shouldSetToolbarWithoutTimeout) {
       title: 'Изображение справа, текст слева'
     },
   ]
+
+  window.CustomButtons.init()
 };
 
 // https://github.com/github/details-dialog-element
@@ -193,10 +195,7 @@ const Popup = (function() {
 
     const dialogHtml = _getDialogHtml(dialogConfig)
 
-    nodes.forEach($node => {
-      $node.insertAdjacentHTML('beforeend', dialogHtml)
-      $node.setAttribute('data-is-custom-buttons-initialized', true)
-    })
+    nodes.forEach($node => $node.insertAdjacentHTML('beforeend', dialogHtml))
     if (submitConfig) {
       _addMousedownListener(submitConfig)
       _addSubmitListener(submitConfig)
@@ -526,7 +525,27 @@ class Caret {
   }
 }
 
-(function() {
+const Utils = (function() {
+  const throttle = (callback, delay) => {
+    let shouldRunCallback = true
+    let timer
+
+    return (...args) => {
+      if (shouldRunCallback) {
+        callback(...args)
+        shouldRunCallback = false
+      } else if (timer) clearTimeout(timer)
+
+      timer = setTimeout(() => {
+        shouldRunCallback = true
+      }, delay)
+    }
+  }
+
+  return { throttle }
+}())
+
+window.CustomButtons = (function() {
   var Selectors = {
     BUTTONS_CONTAINER: '#buttonBar',
     EDITOR: '.cke_inner',
@@ -694,13 +713,6 @@ class Caret {
     })
   }
 
-  function observeReinitializeEditors() {
-    setInterval(() => {
-      const panels = Array.from(document.querySelectorAll(Selectors.PANEL))
-      if (panels.some(($node) => !$node.dataset.isCustomButtonsInitialized)) init()
-    }, 1e4)
-  }
-
   const dialogConfigsFilePath = `${HTMLBUTTONS_PATH}/dialogsConfigs.json`
   function init() {
     setTimeout(function() {
@@ -710,9 +722,10 @@ class Caret {
       loadFile(dialogConfigsFilePath)
         .then(injectButtonsToPanel)
         .catch(console.error)
-      observeReinitializeEditors()
     }, 1e3)
   }
 
-  init()
+  return {
+    init: Utils.throttle(init, 1e3),
+  }
 }());
