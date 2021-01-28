@@ -160,6 +160,16 @@ const loadFile = (function() {
   return _loadFile
 }());
 
+const Selectors = {
+  BUTTONS_CONTAINER: '#buttonBar',
+  EDITOR: '.cke_inner',
+  PANEL: '.cke_toolbox',
+  CONTENT_SOURCE: '.cke_editable',
+  CONTENT_SOURCE_IFRAME: '.cke_wysiwyg_frame',
+  BUNTTONS_CONTAINER: '.cke_top',
+  CUSTOM_BUTTON: '.dialogHolder__button',
+}
+
 // https://codepen.io/ShiningFinger/pen/PLGYBp?editors=0110
 const Popup = (function() {
   let shouldAskToCloseDialog = true
@@ -171,7 +181,7 @@ const Popup = (function() {
 
   const TEMPLATE = `
     <details class="dialogHolder" id="{{popupId}}">
-      <summary class="dialogHolder__button">
+      <summary class="${Selectors.CUSTOM_BUTTON.slice(1)}">
         {{buttonName}}
       </summary>
 
@@ -183,6 +193,7 @@ const Popup = (function() {
   `
 
   const tryToBindDialogQuantity = {}
+  let radioButtonNamePostfix = 0
   const createDialog = (selector, dialogConfig, submitConfig) => {
     const nodes = document.querySelectorAll(selector)
     const bindQuantity = tryToBindDialogQuantity[dialogConfig.formId] || 0
@@ -194,13 +205,32 @@ const Popup = (function() {
     }
 
     const dialogHtml = _getDialogHtml(dialogConfig)
+    const radioButtonNames = ['contentType', 'direction', 'headingWeight']
+    nodes.forEach($node => {
+      let resultDialogHtml = dialogHtml
+      radioButtonNames.forEach((radioButtonName) => {
+        resultDialogHtml = resultDialogHtml
+          .replace(
+            new RegExp(`name=${radioButtonName}`, 'g'),
+            `name=${radioButtonName}_${radioButtonNamePostfix}`
+          )
+          .replace(
+            new RegExp(`(id|for|aria\-labelledby)=${radioButtonName}(Input|Label)_[0-9]+`, 'gi'),
+            (matchedText) => `${matchedText}_${radioButtonNamePostfix}`,
+          )
+      })
 
-    nodes.forEach($node => $node.insertAdjacentHTML('beforeend', dialogHtml))
+      $node.insertAdjacentHTML('beforeend', resultDialogHtml)
+      radioButtonNamePostfix += 1
+    })
     if (submitConfig) {
       _addMousedownListener(submitConfig)
       _addSubmitListener(submitConfig)
       _addSelectSectionListener(submitConfig)
     }
+    document.querySelectorAll(Selectors.CUSTOM_BUTTON).forEach(($button) => {
+      $button.addEventListener('click', window.CustomButtons.memorizeEditorToInjectContent)
+    })
   }
 
   function _getDialogHtml(properties) {
@@ -217,51 +247,53 @@ const Popup = (function() {
   // Поэтому отменим в форме это свойство.
   function _addMousedownListener(submitConfig) {
     const { formId } = submitConfig
-    const $form = document.getElementById(formId)
+    const forms = document.querySelectorAll(`#${formId}`)
 
-    const mousedownHandler = (event) => {
-      event.stopPropagation()
-    }
+    const mousedownHandler = (event) => event.stopPropagation()
 
-    $form.addEventListener('mousedown', mousedownHandler)
+    forms.forEach($form => $form.addEventListener('mousedown', mousedownHandler))
   }
 
   const { hideAllSections, showSelectedSections, selectSectionFieldName } = formSectionTools
 
   function _addSubmitListener(submitConfig) {
     const { formId, onSubmit } = submitConfig
-    const $form = document.getElementById(formId)
+    const forms = document.querySelectorAll(`#${formId}`)
 
-    const submitHandler = (event) => {
-      event.preventDefault()
-      onSubmit(event, $form)
-      hideAllSections($form)
+    forms.forEach(($form) => {
+      const submitHandler = (event) => {
+        event.preventDefault()
+        onSubmit(event, $form)
+        hideAllSections($form)
 
-      shouldAskToCloseDialog = false
-      document.querySelectorAll('[data-close-dialog]')
-        .forEach(closeButton => closeButton.click())
-      shouldAskToCloseDialog = true
-    }
+        shouldAskToCloseDialog = false
+        document.querySelectorAll('[data-close-dialog]')
+          .forEach(closeButton => closeButton.click())
+        shouldAskToCloseDialog = true
+      }
 
-    $form.addEventListener('submit', submitHandler)
+      $form.addEventListener('submit', submitHandler)
+    })
   }
 
   function _addSelectSectionListener(submitConfig) {
     const { formId } = submitConfig
-    const $form = document.getElementById(formId)
-    const $selectSection = $form[selectSectionFieldName]
-    if (!$selectSection) return
+    const forms = document.querySelectorAll(`#${formId}`)
+    forms.forEach(($form) => {
+      const $selectSection = $form[selectSectionFieldName]
+      if (!$selectSection) return
 
-    const selectSectionHandler = (event) => {
-      hideAllSections($form)
+      const selectSectionHandler = (event) => {
+        hideAllSections($form)
 
-      const sectionName = event.target.value
-      if (!sectionName) return
+        const sectionName = event.target.value
+        if (!sectionName) return
 
-      showSelectedSections($form, sectionName)
-    }
+        showSelectedSections($form, sectionName)
+      }
 
-    $selectSection.addEventListener('change', selectSectionHandler)
+      $selectSection.addEventListener('change', selectSectionHandler)
+    })
   }
 
   const getDialogConfig = ({ content, buttonName, popupId }) => [
@@ -364,11 +396,11 @@ const Components = (function() {
     return `
         <iframe
           class="${className}"
-          src="${src}" 
-          frameborder="0" 
+          src="${src}"
+          frameborder="0"
           style="margin:0;"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen 
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
         />
       `
   }
@@ -546,18 +578,11 @@ const Utils = (function() {
 }())
 
 window.CustomButtons = (function() {
-  var Selectors = {
-    BUTTONS_CONTAINER: '#buttonBar',
-    EDITOR: '.cke_inner',
-    PANEL: '.cke_toolbox',
-    CONTENT_SOURCE: '.cke_editable',
-    CONTENT_SOURCE_IFRAME: '.cke_wysiwyg_frame',
-  }
   const HTMLBUTTONS_PATH = '/WebUI/ckeditor/plugins/htmlbuttons'
 
   function injectButtonsToEditor() {
-    var $editor = getElement(Selectors.EDITOR)
-    var $buttons = getElement(Selectors.BUTTONS_CONTAINER)
+    const $editor = getElement(Selectors.EDITOR)
+    const $buttons = getElement(Selectors.BUTTONS_CONTAINER)
 
     if ($editor && $buttons) $editor.appendChild($buttons)
     else setTimeout(injectButtonsToEditor, 1e3)
@@ -571,9 +596,13 @@ window.CustomButtons = (function() {
     return `<img src="${HTMLBUTTONS_PATH}/${iconFileName}" />`
   }
 
+  function _getRadioButtonValue($form, fieldName) {
+    return $form.querySelector(`[name*="${fieldName}"]:checked`).value
+  }
+
   const Submitters = {
     IFRAME: (event, $form) => {
-      const type = $form['contentType'].value
+      const type = _getRadioButtonValue($form, 'contentType')
       const componentHtml = Components[type]({
         src: $form['iframeSrc'].value,
         text: 'Вставьте сюда текст'
@@ -584,10 +613,10 @@ window.CustomButtons = (function() {
 
     HEADING: (event, $form) => {
       const getFormValue = fieldName => $form[fieldName].value
-      const type = getFormValue('contentType')
+      const type = _getRadioButtonValue($form, 'contentType')
       const level = getFormValue('level')
-      const weight = getFormValue('headingWeight')
-      const direction = getFormValue('direction')
+      const weight = _getRadioButtonValue($form, 'headingWeight')
+      const direction = _getRadioButtonValue($form, 'direction')
 
       let headingStyles
       if (weight === 'normal') headingStyles = 'font-family:tele2_displayserif-regular;font-weight: 400;'
@@ -654,14 +683,14 @@ window.CustomButtons = (function() {
         fields,
       } = dialogConfig
       const { formId, submitterId } = submitConfig
-      const submit = Popup.getSubmitConfig(formId, Submitters[submitterId])
+      const config = Popup.getSubmitConfig(formId, Submitters[submitterId])
       const dialog = Popup.getDialogConfig({
         popupId,
         buttonName: isOpenDialogButtonImage ? _getIcon(buttonName) : buttonName,
         content: Components.form({ fields, formId, buttonId, submitText }),
       })
 
-      _createDialog(dialog, submit)
+      _createDialog(dialog, config)
     })
   }
 
@@ -669,37 +698,59 @@ window.CustomButtons = (function() {
     Popup.createDialog(Selectors.PANEL, dialogConfig, submitConfig)
   }
 
-  let editor, caret, lastFocusedElement
-
+  let _editor, _caret, _lastFocusedElement
   function _insertHtmlToContentSource(html) {
     setEditorEvents()
-    if (caret.lastCaretPosition === 0 || !lastFocusedElement) editor.insertAdjacentHTML('afterbegin', html)
-    else if (lastFocusedElement) lastFocusedElement.insertAdjacentHTML('afterend', html)
-  }
 
-  let iframeDocument
+    const isTextarea = _editor.tagName === 'TEXTAREA'
+    if ((_caret && _caret.lastCaretPosition === 0) || !_lastFocusedElement) {
+      if (isTextarea) _editor.value = `${html}${_editor.value}`
+      else _editor.insertAdjacentHTML('afterbegin', html)
+    } else if (_lastFocusedElement) {
+      if (isTextarea) _editor.value += html
+      else _lastFocusedElement.insertAdjacentHTML('afterend', html)
+    }
+  }
 
   function setEditorEvents() {
-    const $iframe = getElement(Selectors.CONTENT_SOURCE_IFRAME)
-    if (!$iframe) return setTimeout(setEditorEvents, 1e3)
+    const iframes = document.querySelectorAll(Selectors.CONTENT_SOURCE_IFRAME)
+    if (!iframes.length) return setTimeout(setEditorEvents, 1e3)
 
-    iframeDocument = $iframe.contentWindow.document
-    $editor = iframeDocument.querySelector(Selectors.CONTENT_SOURCE)
-    if (editor === $editor) return null
-    else if ($editor === null) return setTimeout(setEditorEvents, 1e3)
+    iframes.forEach(($iframe) => {
+      const iframeDocument = $iframe.contentWindow.document
+      const $editor = iframeDocument.querySelector(Selectors.CONTENT_SOURCE)
+      if (!$editor) return setTimeout(setEditorEvents, 1e3)
 
-    editor = $editor
-    caret = new Caret(editor, iframeDocument)
-    editor.addEventListener('keydown', _memorizeCaret)
-    editor.addEventListener('click', _memorizeCaret)
+      const caret = new Caret($editor, iframeDocument)
+      const memorizeCaret = event => _memorizeCaret(event, iframeDocument, caret, $editor)
+      $editor.addEventListener('keydown', memorizeCaret)
+      $editor.addEventListener('click', memorizeCaret)
+    })
   }
 
-  function _memorizeCaret(event) {
+  function _memorizeEditorToInjectContent({ target }) {
+    const iframeContainer = target.closest(Selectors.EDITOR)
+    const $iframe = iframeContainer.querySelector(Selectors.CONTENT_SOURCE_IFRAME)
+    let context
+    if ($iframe) context = $iframe.contentWindow.document
+    else context = iframeContainer
+    const $editor = context.querySelector(Selectors.CONTENT_SOURCE)
+    const caret = new Caret($editor, context)
+    if (_editor && _caret && _editor.isEqualNode($editor)) return null
+
+    _editor = $editor
+    _caret = caret
+  }
+
+  function _memorizeCaret(event, iframeDocument, caret, editor) {
     if (event.target.contentEditable) {
       const { focusNode } = iframeDocument.getSelection()
       const $parent = focusNode.parentElement
-      lastFocusedElement = $parent === editor ? focusNode : $parent
+      _lastFocusedElement = $parent === editor ? focusNode : $parent
     }
+
+    _caret = caret
+    _editor = editor
 
     caret.setPosition()
   }
@@ -727,5 +778,6 @@ window.CustomButtons = (function() {
 
   return {
     init: Utils.throttle(init, 1e3),
+    memorizeEditorToInjectContent: _memorizeEditorToInjectContent,
   }
 }());
