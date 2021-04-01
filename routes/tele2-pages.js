@@ -27,6 +27,7 @@ const ContentNames = {
   HOME28: 'home28',
   TARIFFS: 'tariffs',
   HOME2: 'home2',
+  SUBSCRIBER_ARTICLE: 'subscriber-is-not-registered',
 }
 
 
@@ -71,6 +72,7 @@ const configs = [
   { url: '/home28', contentName: ContentNames.HOME28 },
   { url: '/tariffs', contentName: ContentNames.TARIFFS },
   { url: '/home2', contentName: ContentNames.HOME2 },
+  { url: '/subscriber-is-not-registered', contentName: ContentNames.SUBSCRIBER_ARTICLE },
 ]
 configs.forEach(({ url, contentName }) => {
   router.get(url, (req, res) => {

@@ -862,4 +862,25 @@ router.get('/dialogsConfigs', (req, res) => {
   res.json(JSON.parse(dialogsConfigs))
 })
 
+const tokenId = '12345'
+router.post('/sender/sms', (req, res) => {
+  res.status(429)
+  res.json(getResponse({
+    data: {
+      tokenId,
+    },
+    status: 'TOO_'
+  }))
+})
+
+router.post('/validation/token', (req, res) => {
+  res.status(429)
+  res.json(getResponse({
+    data: {
+      token: 'eyJhbGciOiJIUzI1NiJ9.eyJmaXJzdE5hbWUiOiLQpNC40LsiLCJsYXN0TmFtZSI6ItCW0YPRgNCw0LLQu9C10LIiLCJmdWxsTmFtZSI6ItCk0LjQuyDQltGD0YDQsNCy0LvQtdCyIiwiZXhwIjoxNjQ1NTIzOTkzfQ.OEKkQncepQPObLk7mZaBSAyam6lNlh_53Q0R_Xyp9GI',
+    },
+    status: 'TOO_MANY_ATTEMPTS'
+  }))
+})
+
 module.exports = router
